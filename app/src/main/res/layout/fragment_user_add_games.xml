@@ -57,7 +57,7 @@
         android:backgroundTint="#FFFFFF"
         android:ems="10"
         android:hint="Launch year"
-        android:inputType="text"
+        android:inputType="numberDecimal"
         android:shadowColor="#F4ECEC"
         android:textSize="34sp" />
 

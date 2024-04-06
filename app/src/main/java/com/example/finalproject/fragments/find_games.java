@@ -231,9 +231,9 @@ public class find_games extends Fragment  implements AdapterView.OnItemSelectedL
         ArrayAdapter<String> adapter2 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, gameDates2);
         ArrayAdapter<String> adapter3 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, gameDevComp2);
         // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapter.setDropDownViewResource(R.layout.spinner_item_layout);
+        adapter2.setDropDownViewResource(R.layout.spinner_item_layout);
+        adapter3.setDropDownViewResource(R.layout.spinner_item_layout);
         // Apply the adapter to the spinner
         types_categories.setAdapter(adapter);
         years_categories.setAdapter(adapter2);
