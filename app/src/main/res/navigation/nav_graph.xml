@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/welcome_fragment">
+
+    <fragment
+        android:id="@+id/welcome_fragment"
+        android:name="com.example.finalproject.fragments.welcome_fragment"
+        android:label="fragment_welcome"
+        tools:layout="@layout/fragment_welcome" >
+        <action
+            android:id="@+id/action_welcome_fragment_to_find_games"
+            app:destination="@id/find_games" />
+        <action
+            android:id="@+id/action_welcome_fragment_to_user_add_games"
+            app:destination="@id/user_add_games" />
+    </fragment>
+    <fragment
+        android:id="@+id/find_games"
+        android:name="com.example.finalproject.fragments.find_games"
+        android:label="fragment_find_games"
+        tools:layout="@layout/fragment_find_games" />
+    <fragment
+        android:id="@+id/user_add_games"
+        android:name="com.example.finalproject.fragments.user_add_games"
+        android:label="fragment_user_add_games"
+        tools:layout="@layout/fragment_user_add_games" >
+        <action
+            android:id="@+id/action_user_add_games_to_find_games"
+            app:destination="@id/find_games" />
+    </fragment>
+</navigation>

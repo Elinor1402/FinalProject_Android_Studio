@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">FinalProject</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="spinner_types_prompt">Type of Game</string>
+    <string name="spinner_years_prompt">Published Year</string>
+    <string name="spinner_dev_prompt">Developing Company</string>
+</resources>
