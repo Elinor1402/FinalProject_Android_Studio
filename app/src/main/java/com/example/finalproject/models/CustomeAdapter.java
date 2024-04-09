@@ -14,10 +14,14 @@ import com.example.finalproject.R;
 
 import java.util.ArrayList;
 
+import com.bumptech.glide.annotation.GlideModule;
+import com.bumptech.glide.module.AppGlideModule;
+import com.bumptech.glide.Glide;
+
 public class CustomeAdapter extends RecyclerView.Adapter<CustomeAdapter.MyViewHolder> {
 
-    private ArrayList<Game> dataset;
-    public CustomeAdapter(ArrayList<Game> dataSet) {
+    private ArrayList<GameCard> dataset;
+    public CustomeAdapter(ArrayList<GameCard> dataSet) {
         this.dataset=dataSet;
     }
     public static class MyViewHolder extends RecyclerView.ViewHolder{
@@ -27,7 +31,7 @@ public class CustomeAdapter extends RecyclerView.Adapter<CustomeAdapter.MyViewHo
         TextView textViewYear;
         TextView textViewDevComp;
         TextView textViewDesc;
-//        ImageView imageView;
+        ImageView imageView;
         public MyViewHolder(View itemView){
             super(itemView);
 
@@ -36,7 +40,7 @@ public class CustomeAdapter extends RecyclerView.Adapter<CustomeAdapter.MyViewHo
             textViewYear = itemView.findViewById(R.id.year_c);
             textViewDevComp = itemView.findViewById(R.id.develop_comp_c);
             textViewDesc = itemView.findViewById(R.id.desc_c);
-//            imageView = itemView.findViewById(R.id.imageView);
+            imageView = itemView.findViewById(R.id.image_c);
         }
     }
     @NonNull
@@ -59,12 +63,11 @@ public class CustomeAdapter extends RecyclerView.Adapter<CustomeAdapter.MyViewHo
         holder.textViewDevComp.setText(dataset.get(position).getDevelop_Comp());;
         holder.textViewDesc.setText(dataset.get(position).getDescription());;
 
-//        ImageView imageView = holder.imageView;
-        Game game = dataset.get(position);
-        // Log dataset contents for debugging
-        Log.d("Dataset", "Item at position " + position + ": " + game.getName());
+        // Load image into ImageView using Glide
+        Glide.with(holder.imageView.getContext())
+                .load(dataset.get(position).getImageUri()) // Assuming getImageUri() returns the image URI
+                .into(holder.imageView);
 
-//        imageView.setImageResource(dataset.get(position).getImage());
     }
 
     @Override

@@ -1,4 +1,7 @@
 package com.example.finalproject.models;
+
+import android.net.Uri;
+
 public class Game {
 
     private String name;
@@ -6,6 +9,7 @@ public class Game {
     private String launch_Date;
     private String develop_Comp;
     private String description;
+
 
     public String getName() {
         return name;
@@ -54,6 +58,9 @@ public class Game {
         this.develop_Comp = develop_Comp;
         this.description = description;
     }
+
+
+
 
     public Game(){}
 }

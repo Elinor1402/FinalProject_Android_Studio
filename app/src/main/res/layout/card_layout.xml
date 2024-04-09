@@ -17,13 +17,6 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
-<!--            <ImageView-->
-<!--                android:id="@+id/imageView"-->
-<!--                android:layout_width="192dp"-->
-<!--                android:layout_height="217dp"-->
-<!--                android:layout_gravity="bottom"-->
-<!--                android:layout_weight="1"-->
-<!--                android:src="@drawable/g1" />-->
 
             <ScrollView
                 android:layout_width="match_parent"
@@ -89,6 +82,14 @@
                         android:text="TextView"
                         android:textColor="#0E218A"
                         android:textSize="20sp" />
+
+                    <ImageView
+                        android:id="@+id/image_c"
+                        android:layout_width="138dp"
+                        android:layout_height="195dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:src="@drawable/game_icon" />
                 </LinearLayout>
             </ScrollView>
 

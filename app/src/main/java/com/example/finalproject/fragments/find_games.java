@@ -1,5 +1,6 @@
 package com.example.finalproject.fragments;
 
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -16,15 +17,23 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.example.finalproject.R;
+import com.example.finalproject.activities.MainActivity;
 import com.example.finalproject.models.CustomeAdapter;
 import com.example.finalproject.models.Game;
+import com.example.finalproject.models.GameCard;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.ListResult;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
@@ -49,14 +58,16 @@ public class find_games extends Fragment  implements AdapterView.OnItemSelectedL
     private ArrayList<String> gameDates ;
     private ArrayList<String> gameDevComp ;
     private ArrayList<String> gameDesc ;
-    private ArrayList<Game> dataSet;
+    private ArrayList<GameCard> dataSet;
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
     private CustomeAdapter adapter;
-
     private String selectedType = "Select All";
     private String selectedYear = "Select All";
     private String selectedDevComp = "Select All";
+   private HashMap<String,Uri>imageMap;
+
+   //private  Uri imageUri;
 
     public find_games() {
         // Required empty public constructor
@@ -95,6 +106,10 @@ public class find_games extends Fragment  implements AdapterView.OnItemSelectedL
         gameDesc = new ArrayList<>();
         dataSet = new ArrayList<>();
 
+
+        // Initialize the HashMap
+        imageMap = new HashMap<>();
+
         gameTypes.add("Select All");
         gameDates.add("Select All");
         gameDevComp.add("Select All");
@@ -105,6 +120,41 @@ public class find_games extends Fragment  implements AdapterView.OnItemSelectedL
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference gamesRef = database.getReference("games");
 
+        FirebaseStorage storage  = FirebaseStorage.getInstance();
+
+        StorageReference imagesRef = storage.getReference().child("images/");;
+        // List all items (images) in the root directory
+
+        imagesRef.listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
+            @Override
+            public void onSuccess(ListResult listResult) {
+                // Iterate through each item (image)
+                for (StorageReference item : listResult.getItems()) {
+                    // Get the download URL of the image
+                    item.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            // Add the URI to the list
+                            Log.d("The uri is:",uri.getLastPathSegment());
+                            String imageName=extractImageName(uri.getLastPathSegment());
+                            imageMap.put(imageName,uri);
+                            // Check if all images are loaded
+                            if (imageMap.size() == listResult.getItems().size()) {
+                                Spinner types_categories = getView().findViewById(R.id.types);
+                                simulateItemSelected( types_categories, 0);
+                            }
+                        }
+                    });
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // Handle failure of the listAll() operation
+                Log.e("Firebase Storage", "Error listing images: " + e.getMessage());
+
+            }
+        });;
 
         // Add ValueEventListener to retrieve data
         gamesRef.addValueEventListener(new ValueEventListener() {
@@ -143,6 +193,7 @@ public class find_games extends Fragment  implements AdapterView.OnItemSelectedL
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_find_games, container, false);
+
         recyclerView = view.findViewById(R.id.resView);
 
         recyclerView.setHasFixedSize(true);
@@ -198,16 +249,19 @@ public class find_games extends Fragment  implements AdapterView.OnItemSelectedL
         dataSet.clear(); // Clear the current dataset
         adapter.notifyDataSetChanged();
         int position=0;
-        Log.d("Type: " ,type);
-        Log.d("Year: " ,year);
-        Log.d("Dec comp: " ,dev_comp);
-        Log.d("Size: " ,String.valueOf(dataSet.size()));
+
+//        Log.d("Type: " ,type);
+//        Log.d("Year: " ,year);
+//        Log.d("Dec comp: " ,dev_comp);
+//        Log.d("Size: " ,String.valueOf(dataSet.size()));
 
         for(int i=1;i<gameTypes.size();i++){
             if((gameTypes.get(i).equals(type) || type.equals("Select All")) && (gameDates.get(i).equals(year) || year.equals("Select All"))
                     && (gameDevComp.get(i).equals(dev_comp) || dev_comp.equals("Select All"))) {
 
-                    Game g = new Game(gameNames.get(i), gameTypes.get(i), gameDates.get(i), gameDevComp.get(i), gameDesc.get(i));
+                // Remove punctuation (",", ".", ":") using regular expression
+                    String imageName = gameNames.get(i).replaceAll("[,:.]", "");
+                    GameCard g = new GameCard(gameNames.get(i), gameTypes.get(i), gameDates.get(i), gameDevComp.get(i), gameDesc.get(i),imageMap.get(imageName));
                     dataSet.add(position,g);
                     adapter.notifyItemInserted(position);
                     position++;
@@ -238,6 +292,7 @@ public class find_games extends Fragment  implements AdapterView.OnItemSelectedL
         types_categories.setAdapter(adapter);
         years_categories.setAdapter(adapter2);
         dev_comps_categories.setAdapter(adapter3);
+
 
         types_categories.setOnItemSelectedListener(this);
         years_categories.setOnItemSelectedListener(this);
@@ -270,5 +325,24 @@ public class find_games extends Fragment  implements AdapterView.OnItemSelectedL
 // Free up the HashSet
         set.clear();
         return result;
+    }
+
+    private String extractImageName(String imagePath) {
+        // Remove "images/" from the path
+        String imageName = imagePath.replace("images/", "");
+
+        // Remove file extension
+        int dotIndex = imageName.lastIndexOf('.');
+        if (dotIndex != -1) {
+            imageName = imageName.substring(0, dotIndex);
+        }
+
+        // Remove punctuation (",", ".")
+        imageName = imageName.replaceAll("[,:.]", "");
+
+        return imageName;
+    }
+    private void simulateItemSelected(AdapterView<?> parent, int position) {
+        onItemSelected(parent, parent.getChildAt(position), position, parent.getAdapter().getItemId(position));
     }
 }
