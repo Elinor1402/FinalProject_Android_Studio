@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import android.util.Log;
@@ -17,6 +18,7 @@ import android.widget.ImageView;
 import com.example.finalproject.R;
 import com.example.finalproject.activities.MainActivity;
 import com.example.finalproject.models.Game;
+import com.example.finalproject.models.ItemViewModel;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import android.content.Intent;
@@ -52,7 +54,6 @@ public class user_add_games extends Fragment {
 
     private Boolean clean=false;
 
-    Bundle bundle;
 
     public user_add_games() {
         // Required empty public constructor
@@ -92,18 +93,13 @@ public class user_add_games extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_user_add_games, container, false);
 
-        bundle = new Bundle();
-
         Button addGame = view.findViewById(R.id.send_game);
-//        Button selectImg = view.findViewById(R.id.select_img);
-
 
         EditText game_name1 = ((EditText)view.findViewById(R.id.game_name));
         EditText game_type1 = ((EditText)view.findViewById(R.id.game_type));
         EditText launch_Date1 = ((EditText)view.findViewById(R.id.launch_data));
         EditText develop_comp1 = ((EditText)view.findViewById(R.id.develop_comp));
         EditText game_desc1 = ((EditText)view.findViewById(R.id.game_desc));
-
         ImageView selectImg = (ImageView) view.findViewById(R.id.selectImg);
         // Initialize Firebase Storage
         storageReference = FirebaseStorage.getInstance().getReference();
@@ -114,7 +110,6 @@ public class user_add_games extends Fragment {
                         Intent data = result.getData();
                         imageUri = data.getData();
                         Log.d("Image uri:",imageUri.toString());
-
                         selectImg.setImageURI(imageUri);
                     }
                 });;
@@ -146,10 +141,9 @@ public class user_add_games extends Fragment {
                     uploadImage(game_name1.getText().toString().trim());
 
                     clean=true;
-//                    selectImg.setImageURI(imageUri);
 
                     //navigate to find_games fragment
-                    Navigation.findNavController(view).navigate(R.id.action_user_add_games_to_find_games,bundle);
+                    Navigation.findNavController(view).navigate(R.id.action_user_add_games_to_find_games);
                 }
             }
         });
@@ -188,21 +182,12 @@ public class user_add_games extends Fragment {
                     .addOnSuccessListener(taskSnapshot -> {
                         Toast.makeText(getActivity(), "Upload successful", Toast.LENGTH_SHORT).show();
 
-//                        Fragment frg = null;
-//                        frg = getParentFragmentManager().findFragmentByTag("find_games");
-//                        if (frg != null) {
-//                            FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-//                            ft.detach(frg);
-//                            ft.attach(frg);
-//                            ft.commit();
-//                            // Force redraw
-//                            frg.getView().invalidate();
-//                        }
-                        // Handle successful uploads here, e.g., get the download URL
+                       //  Handle successful uploads here, e.g., get the download URL
                         fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
 
-                            // Put the Uri as an argument in the bundle
-                            bundle.putString("newImageUri",uri.toString());
+                            ItemViewModel viewModel = new ViewModelProvider(requireActivity()).get(ItemViewModel.class);
+                            viewModel.selectItem(uri);
+
 
                         });
                     })

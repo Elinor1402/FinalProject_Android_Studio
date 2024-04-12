@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +22,7 @@ import com.example.finalproject.activities.MainActivity;
 import com.example.finalproject.models.CustomeAdapter;
 import com.example.finalproject.models.Game;
 import com.example.finalproject.models.GameCard;
+import com.example.finalproject.models.ItemViewModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -186,6 +188,18 @@ public class find_games extends Fragment  implements AdapterView.OnItemSelectedL
                 Log.w("loadPost:onCancelled", databaseError.toException());
             }
         });
+
+        ItemViewModel viewModel = new ViewModelProvider(requireActivity()).get(ItemViewModel.class);
+        viewModel.getSelectedItem().observe(this,item->{
+            if(item!=null) {
+                String imageName = extractImageName(item.getLastPathSegment());
+                imageMap.put(imageName, item);
+                Spinner types_categories = getView().findViewById(R.id.types);
+                simulateItemSelected( types_categories, 0);
+                viewModel.selectItem(null);
+            }
+        });
+
     }
 
     @Override
@@ -250,11 +264,6 @@ public class find_games extends Fragment  implements AdapterView.OnItemSelectedL
         adapter.notifyDataSetChanged();
         int position=0;
 
-//        Log.d("Type: " ,type);
-//        Log.d("Year: " ,year);
-//        Log.d("Dec comp: " ,dev_comp);
-//        Log.d("Size: " ,String.valueOf(dataSet.size()));
-
         for(int i=1;i<gameTypes.size();i++){
             if((gameTypes.get(i).equals(type) || type.equals("Select All")) && (gameDates.get(i).equals(year) || year.equals("Select All"))
                     && (gameDevComp.get(i).equals(dev_comp) || dev_comp.equals("Select All"))) {
@@ -267,9 +276,6 @@ public class find_games extends Fragment  implements AdapterView.OnItemSelectedL
                     position++;
             }
         }
-
-       // Log.d("Size of GameTypes", String.valueOf(gameTypes.size()));
-
     }
     private void setUpSpinners() {
         Spinner types_categories = getView().findViewById(R.id.types);
@@ -303,9 +309,6 @@ public class find_games extends Fragment  implements AdapterView.OnItemSelectedL
         adapter2.notifyDataSetChanged();
         adapter3.notifyDataSetChanged();
 
-//        types_categories.setSelection(0);
-//        years_categories.setSelection(0);
-//        dev_comps_categories.setSelection(0);
     }
     private ArrayList<String> removeDuplicates(ArrayList<String> list) {
         // Create a HashSet to store unique elements
